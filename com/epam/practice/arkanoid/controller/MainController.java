@@ -39,7 +39,6 @@ public class MainController {
     private Utils game;
     private Boolean stop;
     private Boolean pause;
-    private int playerScore;
     private int countLife;
     private boolean die;
     private boolean changedBalls;
@@ -49,7 +48,6 @@ public class MainController {
         die = false;
         stop = false;
         pause = false;
-        playerScore = 0;
         countLife = 1;
     }
 
@@ -59,25 +57,6 @@ public class MainController {
         time.setDisable(true);
         score.setDisable(true);
         setDisablePauseStopButtons(true);
-    }
-
-    private void makeTime() {
-        Date date = new Date();
-        new AnimationTimer() {
-            public void handle(long currentTime) {
-                {
-                    if (game.isStart()) {
-                        Calendar calendar = Calendar.getInstance();
-                        long seconds=calendar.getTime().getTime() - date.getTime();
-                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("mm:ss", Locale.getDefault());
-                        time.setText("Time: " + simpleDateFormat.format(seconds));
-                        playerScore = (int) (seconds / 10000 * game.getBallSpeed());
-                        game.changeBallSpeed(seconds/100000);
-                        score.setText("Score: " + playerScore);
-                    }
-                }
-            }
-        }.start();
     }
 
     @FXML
@@ -116,10 +95,10 @@ public class MainController {
         stop = false;
         try {
             Integer i = Integer.parseInt(speed.getText());
-            if (i > 10 || i < 0)
+            if (i > 7 || i < 0)
                 throw new RuntimeException();
             game.setBallSpeed(i);
-            i= Integer.parseInt(count.getText());
+            i = Integer.parseInt(count.getText());
             if (i > 3 || i < 0)
                 throw new RuntimeException();
             countLife = i;
@@ -133,18 +112,39 @@ public class MainController {
         changedBalls = false;
     }
 
+    private void makeTime() {
+        Date date = new Date();
+        new AnimationTimer() {
+            public void handle(long currentTime) {
+                {
+                    if (game.isStart()) {
+                        Calendar calendar = Calendar.getInstance();
+                        long seconds = calendar.getTime().getTime() - date.getTime();
+                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("mm:ss", Locale.getDefault());
+                        time.setText("Time: " + simpleDateFormat.format(seconds));
+                        if (seconds / 100000 < 1) {
+                            game.changeBallSpeed(seconds / 100000);
+                        }
+                        score.setText("Score: " +  (seconds / 10000 * game.getBallSpeed()));
+
+                    }
+                }
+            }
+        }.start();
+    }
+
     private void checkProperties() {
         new Thread(() -> {
             while (!die) {
                 if (game.isStart()) {
                     setDisableStartFieldButtons(true);
                 } else {
-                   setDisableStartFieldButtons(false);
+                    setDisableStartFieldButtons(false);
                 }
                 if (stop) {
                     setDisablePauseStopButtons(true);
                 } else {
-                   setDisablePauseStopButtons(false);
+                    setDisablePauseStopButtons(false);
                 }
                 if (!game.isBallAlive() && !changedBalls) {
                     countLife--;
@@ -160,19 +160,18 @@ public class MainController {
                     }
                 }
             }
-
         }).start();
     }
 
-    public  void setDisablePauseStopButtons(boolean flag){
+    public void setDisablePauseStopButtons(boolean flag) {
         stopButton.setDisable(flag);
         pauseButton.setDisable(flag);
     }
-    public void setDisableStartFieldButtons(boolean flag){
+
+    public void setDisableStartFieldButtons(boolean flag) {
         startButton.setDisable(flag);
         speed.setDisable(flag);
         score.setDisable(flag);
         count.setDisable(flag);
-
     }
 }

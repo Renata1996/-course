@@ -15,7 +15,7 @@ public class Ball extends Circle {
         this.setRadius(radius);
         this.speed = speed;
         this.alive = true;
-        this.angle = -(Math.random()*Math.PI);
+        this.angle =-(Math.random()*Math.PI);
     }
 
     public void update()
@@ -29,7 +29,7 @@ public class Ball extends Circle {
     }
 
     public void changeAngle() {
-        this.angle = -(Math.random()*Math.PI);
+        this.angle =-(Math.random()*Math.PI);
     }
 
     public double getAngle() {
