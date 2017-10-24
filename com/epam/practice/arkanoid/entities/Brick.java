@@ -59,4 +59,12 @@ public class Brick {
         rectangles.clear();
         makeRectangle();
     }
+
+    public void setFirstY(int firstY) {
+        this.firstY = firstY;
+    }
+
+    public int getFirstY() {
+        return firstY;
+    }
 }

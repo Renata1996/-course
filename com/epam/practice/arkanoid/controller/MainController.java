@@ -1,6 +1,7 @@
 package com.epam.practice.arkanoid.controller;
 
 import javafx.animation.AnimationTimer;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
@@ -63,14 +64,31 @@ public class MainController {
     private void handleStartGameButtonClick(MouseEvent event) {
         beforeStart.setVisible(false);
         startGameButton.setVisible(false);
+        startGameButton.setDisable(false);
+        makeStop();
         checkProperties();
     }
 
 
     @FXML
     private void handleStopButtonClick(MouseEvent event) {
-        game.setStart(false);
-        stop = true;
+        beforeStart.setVisible(true);
+        startGameButton.setVisible(true);
+    }
+
+    public void makeStop() {
+        setDisablePauseStopButtons(true);
+        startButton.setDisable(false);
+        time.setText("");
+        score.setText("");
+        game.makeNewGame();
+        game.run();
+        game.makeBall();
+        makeTime();
+        stop = false;
+        die = false;
+        countLife=3;
+        count.setText("3");
     }
 
     @FXML
@@ -93,9 +111,10 @@ public class MainController {
         makeTime();
         setDisablePauseStopButtons(false);
         stop = false;
+        die = false;
         try {
             Integer i = Integer.parseInt(speed.getText());
-            if (i > 7 || i < 0)
+            if (i > 5 || i < 0)
                 throw new RuntimeException();
             game.setBallSpeed(i);
             i = Integer.parseInt(count.getText());
@@ -125,7 +144,7 @@ public class MainController {
                         if (seconds / 100000 < 1) {
                             game.changeBallSpeed(seconds / 100000);
                         }
-                        score.setText("Score: " +  (seconds / 10000 * game.getBallSpeed()));
+                        score.setText("Score: " + (int) (seconds / 10000 * game.getBallSpeed()));
 
                     }
                 }
@@ -154,8 +173,10 @@ public class MainController {
                         stop = true;
                         countLife = -1;
                         beforeStart.setVisible(true);
+                        startGameButton.setVisible(true);
                     } else {
-                        count.setText(String.valueOf(countLife));
+                        count.setText(Integer.toString(countLife));
+                        // ("дебильная бага из-за того ято fx иногда не видет текст филд");
                         startButton.setDisable(false);
                     }
                 }

@@ -5,6 +5,7 @@ import com.epam.practice.arkanoid.entities.Board;
 import com.epam.practice.arkanoid.entities.Brick;
 import javafx.animation.AnimationTimer;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Rectangle;
 
@@ -114,7 +115,6 @@ public class Utils {
                 brick.getRectangles().remove(i);
             }
         }
-
     }
 
     private void checkBallAngle() {
@@ -226,5 +226,21 @@ public class Utils {
 
     }
 
+    public void makeNewGame() {
 
+        ball.move(board.getX() + board.getWidth() / 2, board.getY());
+        board.move(pane.getPrefWidth() / 2);
+        brick.setFirstY(10);
+        brick.makeNewBricks();
+        for (Node n : pane.getChildren()) {
+            if (n instanceof Group) {
+                pane.getChildren().remove(n);
+                break;
+            }
+        }
+        pane.getChildren().add(makeBricksGroup());
+        start = false;
+        angle = ball.getAngle();
+
+    }
 }
