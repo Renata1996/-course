@@ -16,8 +16,7 @@ public class Utils {
     private Brick brick;
     private Ball ball;
     private boolean start;
-    private int ballSpeed;
-
+    private double ballSpeed;
 
     public Utils(Pane pane) {
         this.start = false;
@@ -32,17 +31,17 @@ public class Utils {
     }
 
     public void makeBall() {
-            ball.setAlive(true);
-            ball.move(board.getX() + board.getWidth() / 2, board.getY());
-            ball.changeAngle();
+        ball.setAlive(true);
+        ball.move(board.getX() + board.getWidth() / 2, board.getY());
+        ball.changeAngle();
     }
 
     private void initializeItems() {
         //default params
         ballSpeed = 3;
-        this.board = new Board(pane.getPrefWidth() / 2, pane.getPrefHeight());
-        this.brick = new Brick(0, 60, 3, pane.getPrefWidth());
-        this.ball = new Ball(board.getX() + board.getWidth() / 2, board.getY(), 10, ballSpeed);
+        board = new Board(pane.getPrefWidth() / 2, pane.getPrefHeight());
+        brick = new Brick(0, 60, 3, pane.getPrefWidth());
+        ball = new Ball(board.getX() + board.getWidth() / 2, board.getY(), 10, ballSpeed);
     }
 
     private void moveBoard() {
@@ -106,7 +105,8 @@ public class Utils {
 
         }
     }
-    public boolean isBallAlive(){
+
+    public boolean isBallAlive() {
         return ball.isAlive();
     }
 
@@ -187,13 +187,21 @@ public class Utils {
     }
 
 
-    public int getBallSpeed() {
+    public double getBallSpeed() {
         return ballSpeed;
     }
 
-    public void setBallSpeed(int ballSpeed) {
+    public void setBallSpeed(double ballSpeed) {
         this.ballSpeed = ballSpeed;
         ball.setSpeed(ballSpeed);
+    }
+
+    public void changeBallSpeed(double ballSpeed) {
+        if (ballSpeed < 10) {
+            this.ballSpeed += ballSpeed;
+            ball.setSpeed(this.ballSpeed);
+        }
+
     }
 
 

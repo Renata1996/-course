@@ -5,10 +5,10 @@ import javafx.scene.shape.Circle;
 
 public class Ball extends Circle {
     private double angle;
-    private int speed;
+    private double speed;
     private boolean alive;
 
-    public Ball(double x, double y, double radius, int speed) {
+    public Ball(double x, double y, double radius, double speed) {
         this.setFill(Color.BLUE);
         this.setCenterX(x);
         this.setCenterY(y-radius);
@@ -40,11 +40,11 @@ public class Ball extends Circle {
         this.angle = angle;
     }
 
-    public int getSpeed() {
+    public double getSpeed() {
         return speed;
     }
 
-    public void setSpeed(int speed) {
+    public void setSpeed(double speed) {
         this.speed = speed;
     }
 
@@ -55,4 +55,6 @@ public class Ball extends Circle {
     public void setAlive(boolean alive) {
         this.alive = alive;
     }
+
+
 }

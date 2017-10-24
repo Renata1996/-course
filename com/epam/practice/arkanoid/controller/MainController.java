@@ -2,24 +2,15 @@ package com.epam.practice.arkanoid.controller;
 
 import javafx.animation.AnimationTimer;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
-import javafx.scene.canvas.*;
 import javafx.scene.control.Button;
-import javafx.scene.control.IndexedCell;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-import java.util.TimerTask;
 
 
 public class MainController {
@@ -35,11 +26,15 @@ public class MainController {
     @FXML
     private Pane board;
     @FXML
-    Button startButton;
+    private Button startButton;
     @FXML
-    Button pauseButton;
+    private Button pauseButton;
     @FXML
-    Button stopButton;
+    private Button stopButton;
+    @FXML
+    private Button startGameButton;
+    @FXML
+    private Pane beforeStart;
 
     private Utils game;
     private Boolean stop;
@@ -47,13 +42,15 @@ public class MainController {
     private int playerScore;
     private int countLife;
     private boolean die;
+    private boolean changedBalls;
 
     {
+        changedBalls = false;
         die = false;
         stop = false;
         pause = false;
         playerScore = 0;
-        countLife = 3;
+        countLife = 1;
     }
 
     @FXML
@@ -61,8 +58,7 @@ public class MainController {
         game = new Utils(board);
         time.setDisable(true);
         score.setDisable(true);
-        stopButton.setDisable(true);
-        pauseButton.setDisable(true);
+        setDisablePauseStopButtons(true);
     }
 
     private void makeTime() {
@@ -72,25 +68,30 @@ public class MainController {
                 {
                     if (game.isStart()) {
                         Calendar calendar = Calendar.getInstance();
+                        long seconds=calendar.getTime().getTime() - date.getTime();
                         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("mm:ss", Locale.getDefault());
-                        time.setText("Time: " + simpleDateFormat.format(calendar.getTime().getTime() - date.getTime()));
-                        playerScore = (int) (calendar.getTime().getTime() - date.getTime()) / 1000;
-                        playerScore *= game.getBallSpeed();
+                        time.setText("Time: " + simpleDateFormat.format(seconds));
+                        playerScore = (int) (seconds / 10000 * game.getBallSpeed());
+                        game.changeBallSpeed(seconds/100000);
                         score.setText("Score: " + playerScore);
                     }
-
-
                 }
             }
         }.start();
     }
 
     @FXML
-    private void handleStopButtonClick(MouseEvent event) {
+    private void handleStartGameButtonClick(MouseEvent event) {
+        beforeStart.setVisible(false);
+        startGameButton.setVisible(false);
+        checkProperties();
+    }
 
+
+    @FXML
+    private void handleStopButtonClick(MouseEvent event) {
         game.setStart(false);
         stop = true;
-
     }
 
     @FXML
@@ -103,80 +104,75 @@ public class MainController {
             pause = false;
             pauseButton.setText("Pause");
             game.setStart(true);
-
         }
     }
 
     @FXML
     private void handleStartButtonClick(MouseEvent event) {
         game.run();
-        makeTime();
         game.makeBall();
-        stopButton.setDisable(false);
-        pauseButton.setDisable(false);
+        makeTime();
+        setDisablePauseStopButtons(false);
         stop = false;
         try {
             Integer i = Integer.parseInt(speed.getText());
             if (i > 10 || i < 0)
                 throw new RuntimeException();
             game.setBallSpeed(i);
-            Integer j = Integer.parseInt(count.getText());
-            if (j > 5 || j < 0)
+            i= Integer.parseInt(count.getText());
+            if (i > 3 || i < 0)
                 throw new RuntimeException();
-            countLife = j;
-
-
+            countLife = i;
         } catch (RuntimeException e) {
             speed.setText("3");
             game.setBallSpeed(3);
-            countLife = 3;
-            count.setText("3");
+            countLife = 1;
+            count.setText("1");
         }
         game.setStart(true);
-        checkProperties();
+        changedBalls = false;
     }
 
     private void checkProperties() {
         new Thread(() -> {
-            if (!die) {
+            while (!die) {
                 if (game.isStart()) {
-                    startButton.setDisable(true);
-                    speed.setDisable(true);
-                    score.setDisable(true);
-                    count.setDisable(true);
+                    setDisableStartFieldButtons(true);
                 } else {
-                    startButton.setDisable(false);
-                    speed.setDisable(false);
-                    score.setDisable(false);
-                    count.setDisable(false);
+                   setDisableStartFieldButtons(false);
                 }
                 if (stop) {
-                    stopButton.setDisable(true);
-                    pauseButton.setDisable(true);
+                    setDisablePauseStopButtons(true);
                 } else {
-                    stopButton.setDisable(false);
-                    pauseButton.setDisable(false);
+                   setDisablePauseStopButtons(false);
                 }
+                if (!game.isBallAlive() && !changedBalls) {
+                    countLife--;
+                    changedBalls = true;
+                    if (countLife < 0) {
+                        die = true;
+                        stop = true;
+                        countLife = -1;
+                        beforeStart.setVisible(true);
+                    } else {
+                        count.setText(String.valueOf(countLife));
+                        startButton.setDisable(false);
+                    }
+                }
+            }
 
-            } else {
-                startButton.setDisable(true);
-                stopButton.setDisable(true);
-                pauseButton.setDisable(true);
-            }
-            if (game.isBallAlive()) {
-                countLife--;
-                if (countLife < 0) {
-                    die = true;
-                    stop = true;
-                    countLife = -1;
-                    board.setStyle("-fx-background-color: pink;");
-                    game.setStart(false);
-                } else {
-                    count.setText(String.valueOf(countLife));
-                    startButton.setDisable(false);
-                }
-            }
         }).start();
     }
 
+    public  void setDisablePauseStopButtons(boolean flag){
+        stopButton.setDisable(flag);
+        pauseButton.setDisable(flag);
+    }
+    public void setDisableStartFieldButtons(boolean flag){
+        startButton.setDisable(flag);
+        speed.setDisable(flag);
+        score.setDisable(flag);
+        count.setDisable(flag);
+
+    }
 }

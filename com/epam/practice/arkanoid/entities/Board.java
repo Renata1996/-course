@@ -23,4 +23,8 @@ public class Board extends Rectangle {
     }
 
 
+    public void setXY(double x, double y) {
+        this.setX(x);
+        this.setY(y-height);
+    }
 }

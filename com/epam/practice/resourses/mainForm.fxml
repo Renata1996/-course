@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.text.*?>
 <?import javafx.scene.canvas.*?>
 <?import java.lang.*?>
 <?import java.util.*?>
@@ -10,15 +11,24 @@
 <Pane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.epam.practice.arkanoid.controller.MainController">
    <children>
       <Pane id="board" fx:id="board" layoutX="23.0" layoutY="58.0" prefHeight="315.0" prefWidth="553.0" style="-fx-background-color: White;" />
-      <Button id="startButton" fx:id="startButton" onMouseClicked="#handleStartButtonClick" layoutY="19.0" mnemonicParsing="false"  prefHeight="25.0" prefWidth="84.0" text="Start" />
-      <Button id="stopButton" fx:id="stopButton" onMouseClicked="#handleStopButtonClick" layoutX="85.0" layoutY="19.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="70.0" text="Stop" />
-      <Button id="pauseButton" fx:id="pauseButton" onMouseClicked="#handlePauseButtonClick" layoutX="155.0" layoutY="18.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="77.0" text="Pause" />
+      <Button id="startButton" fx:id="startButton" layoutY="19.0" mnemonicParsing="false" onMouseClicked="#handleStartButtonClick" prefHeight="25.0" prefWidth="84.0" text="Start" />
+      <Button id="stopButton" fx:id="stopButton" layoutX="85.0" layoutY="19.0" mnemonicParsing="false" onMouseClicked="#handleStopButtonClick" prefHeight="25.0" prefWidth="70.0" text="Stop" />
+      <Button id="pauseButton" fx:id="pauseButton" layoutX="155.0" layoutY="18.0" mnemonicParsing="false" onMouseClicked="#handlePauseButtonClick" prefHeight="25.0" prefWidth="77.0" text="Pause" />
       <Label layoutX="253.0" layoutY="14.0" text="Balls Count" />
       <Label layoutX="418.0" layoutY="14.0" text="Balls Speed" />
-      <TextField id="ballsCount" fx:id="count" layoutX="253.0" layoutY="30.0" text="3" />
+      <TextField id="ballsCount" fx:id="count" layoutX="253.0" layoutY="30.0" text="1" />
       <TextField id="ballsSpeed" fx:id="speed" layoutX="418.0" layoutY="30.0" text="3" />
       <TextField id="time" fx:id="time" layoutX="11.0" layoutY="374.0" />
       <TextField id="score" fx:id="score" layoutX="432.0" layoutY="374.0" />
+      <Pane fx:id="beforeStart" layoutY="8.0" prefHeight="392.0" prefWidth="581.0" style="-fx-background-color: Red;">
+         <children>
+            <Button fx:id="startGameButton" layoutX="129.0" layoutY="145.0" mnemonicParsing="false" onMouseClicked="#handleStartGameButtonClick" prefHeight="92.0" prefWidth="323.0" style="-fx-background-color: Red;" text="StartGame" textFill="#2f0505">
+               <font>
+                  <Font size="48.0" />
+               </font>
+            </Button>
+         </children>
+      </Pane>
 
 
    </children>
