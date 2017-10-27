@@ -1,13 +1,11 @@
 package com.epam.practice.arkanoid.controller;
 
 import javafx.animation.AnimationTimer;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
-
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -15,6 +13,19 @@ import java.util.Locale;
 
 
 public class MainController {
+    private static final String EMPTY_STRING = "";
+    private static final int DEFAULT_COUNT_LIFE = 3;
+    private static final int START_COUNT_LIFE = 1;
+    private static final int DEFAULT_COUNT_SPEED = 3;
+    private static final String PAUSE_TEXT = "Pause";
+    private static final String RESUME_TEXT = "Resume";
+    private static final int MAX_SPEED = 5;
+    private static final int MIN_SPEED = 0;
+    private static final int MIN_COUNT_LIFE = 0;
+    private static final int MAX_COUNT_LIFE = 3;
+    private static final int TIME = 100000;
+    private static final int IMPOSSIBLE_COUT_LIFE = -1;
+    private static final int CHANGE_BALL_SPEED_TIME = 1;
 
     @FXML
     private TextField speed;
@@ -39,18 +50,11 @@ public class MainController {
 
     private Utils game;
     private Boolean stop;
-    private Boolean pause;
-    private int countLife;
-    private boolean die;
-    private boolean changedBalls;
+    private Boolean pause = false;
+    private int countLife = START_COUNT_LIFE;
+    private boolean die = false;
+    private boolean changedBalls = false;
 
-    {
-        changedBalls = false;
-        die = false;
-        stop = false;
-        pause = false;
-        countLife = 1;
-    }
 
     @FXML
     public void initialize() {
@@ -76,30 +80,30 @@ public class MainController {
         startGameButton.setVisible(true);
     }
 
-    public void makeStop() {
+    private void makeStop() {
         setDisablePauseStopButtons(true);
         startButton.setDisable(false);
-        time.setText("");
-        score.setText("");
+        time.setText(EMPTY_STRING);
+        score.setText(EMPTY_STRING);
         game.makeNewGame();
         game.run();
         game.makeBall();
         makeTime();
         stop = false;
         die = false;
-        countLife=3;
-        count.setText("3");
+        countLife = DEFAULT_COUNT_LIFE;
+        count.setText(String.valueOf(DEFAULT_COUNT_LIFE));
     }
 
     @FXML
     private void handlePauseButtonClick(MouseEvent event) {
         if (!pause) {
-            pauseButton.setText("Resume");
+            pauseButton.setText(RESUME_TEXT);
             game.setStart(false);
             pause = true;
         } else {
             pause = false;
-            pauseButton.setText("Pause");
+            pauseButton.setText(PAUSE_TEXT);
             game.setStart(true);
         }
     }
@@ -112,23 +116,31 @@ public class MainController {
         setDisablePauseStopButtons(false);
         stop = false;
         die = false;
+
         try {
-            Integer i = Integer.parseInt(speed.getText());
-            if (i > 5 || i < 0)
-                throw new RuntimeException();
-            game.setBallSpeed(i);
-            i = Integer.parseInt(count.getText());
-            if (i > 3 || i < 0)
-                throw new RuntimeException();
-            countLife = i;
-        } catch (RuntimeException e) {
-            speed.setText("3");
-            game.setBallSpeed(3);
-            countLife = 1;
-            count.setText("1");
+            Integer textFromFields = Integer.parseInt(speed.getText());
+            if (textFromFields < MIN_SPEED || textFromFields > MAX_SPEED) {
+                makeDefault();
+                game.setBallSpeed(textFromFields);
+                textFromFields = Integer.parseInt(count.getText());
+            }
+            if (textFromFields < MIN_COUNT_LIFE || textFromFields > MAX_COUNT_LIFE) {
+                makeDefault();
+                countLife = textFromFields;
+            }
+        } catch (NumberFormatException e) {
+            makeDefault();
         }
         game.setStart(true);
         changedBalls = false;
+
+    }
+
+    private void makeDefault() {
+        speed.setText(String.valueOf(DEFAULT_COUNT_SPEED));
+        game.setBallSpeed(DEFAULT_COUNT_SPEED);
+        countLife = START_COUNT_LIFE;
+        count.setText(String.valueOf(START_COUNT_LIFE));
     }
 
     private void makeTime() {
@@ -141,10 +153,10 @@ public class MainController {
                         long seconds = calendar.getTime().getTime() - date.getTime();
                         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("mm:ss", Locale.getDefault());
                         time.setText("Time: " + simpleDateFormat.format(seconds));
-                        if (seconds / 100000 < 1) {
-                            game.changeBallSpeed(seconds / 100000);
+                        if (seconds / TIME < CHANGE_BALL_SPEED_TIME) {
+                            game.changeBallSpeed(seconds / TIME);
                         }
-                        score.setText("Score: " + (int) (seconds / 10000 * game.getBallSpeed()));
+                        score.setText("Score: " + (int) (seconds / TIME * game.getBallSpeed()));
 
                     }
                 }
@@ -168,15 +180,15 @@ public class MainController {
                 if (!game.isBallAlive() && !changedBalls) {
                     countLife--;
                     changedBalls = true;
-                    if (countLife < 0) {
+                    if (countLife < MIN_COUNT_LIFE) {
                         die = true;
                         stop = true;
-                        countLife = -1;
+                        countLife = IMPOSSIBLE_COUT_LIFE;
                         beforeStart.setVisible(true);
                         startGameButton.setVisible(true);
                     } else {
                         count.setText(Integer.toString(countLife));
-                        // ("дебильная бага из-за того ято fx иногда не видет текст филд");
+                        // ("дебильная бага из-за того, что fx иногда не видит текст филд");
                         startButton.setDisable(false);
                     }
                 }
@@ -184,12 +196,12 @@ public class MainController {
         }).start();
     }
 
-    public void setDisablePauseStopButtons(boolean flag) {
+    private void setDisablePauseStopButtons(boolean flag) {
         stopButton.setDisable(flag);
         pauseButton.setDisable(flag);
     }
 
-    public void setDisableStartFieldButtons(boolean flag) {
+    private void setDisableStartFieldButtons(boolean flag) {
         startButton.setDisable(flag);
         speed.setDisable(flag);
         score.setDisable(flag);

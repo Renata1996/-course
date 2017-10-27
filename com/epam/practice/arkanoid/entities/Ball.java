@@ -11,25 +11,25 @@ public class Ball extends Circle {
     public Ball(double x, double y, double radius, double speed) {
         this.setFill(Color.BLUE);
         this.setCenterX(x);
-        this.setCenterY(y-radius);
+        this.setCenterY(y - radius);
         this.setRadius(radius);
         this.speed = speed;
         this.alive = true;
-        this.angle =-(Math.random()*Math.PI);
+        this.angle = -(Math.random() * Math.PI);
     }
 
-    public void update()
-    {
+    public void update() {
         setCenterX(getCenterX() + speed * Math.cos(angle));
         setCenterY(getCenterY() + speed * Math.sin(angle));
     }
-    public void move(double x, double y){
+
+    public void move(double x, double y) {
         this.setCenterX(x);
-        this.setCenterY(y-getRadius());
+        this.setCenterY(y - getRadius());
     }
 
     public void changeAngle() {
-        this.angle =-(Math.random()*Math.PI);
+        this.angle = -(Math.random() * Math.PI);
     }
 
     public double getAngle() {

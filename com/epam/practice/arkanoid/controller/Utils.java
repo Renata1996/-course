@@ -12,6 +12,19 @@ import javafx.scene.shape.Rectangle;
 public class Utils {
 
     private static final int MARGIN = 5;
+    private static final int HALF = 2;
+    private static final int BALL_RADIUS = 10;
+    private static final int DEFAULT_BALL_SPEED = 3;
+    private static final int DEFAULT_ANGLE_COUNT = 0;
+    private static final int FIRST_X_BRICK = 0;
+    private static final int FIRST_Y_BRICK = 60;
+    private static final int COUNT_LINES_BRICK = 3;
+    private static final int LOCAL_X = 0;
+    private static final int LOCAL_Y = 0;
+    private static final int LOCAL_WIDTH_HEIGHT = 1;
+    private static final double BALL_COLLISION_PARAM = 0.01;
+    private static final int BALL_COLLISION_COUNT = 5;
+    private static final int BALL_SPEED_MAX = 7;
     private Pane pane;
     private Board board;
     private Brick brick;
@@ -21,8 +34,9 @@ public class Utils {
     private double angle;
     private int angleCount;
 
+
     public Utils(Pane pane) {
-        this.angleCount = 0;
+        this.angleCount = DEFAULT_ANGLE_COUNT;
         this.start = false;
         this.pane = pane;
         initializeItems();
@@ -36,16 +50,16 @@ public class Utils {
 
     public void makeBall() {
         ball.setAlive(true);
-        ball.move(board.getX() + board.getWidth() / 2, board.getY());
+        ball.move(board.getX() + board.getWidth() / HALF, board.getY());
         ball.changeAngle();
     }
 
     private void initializeItems() {
-        //default params
-        ballSpeed = 3;
-        board = new Board(pane.getPrefWidth() / 2, pane.getPrefHeight());
-        brick = new Brick(0, 60, 3, pane.getPrefWidth());
-        ball = new Ball(board.getX() + board.getWidth() / 2, board.getY(), 10, ballSpeed);
+
+        ballSpeed = DEFAULT_BALL_SPEED;
+        board = new Board(pane.getPrefWidth() / HALF, pane.getPrefHeight());
+        brick = new Brick(FIRST_X_BRICK, FIRST_Y_BRICK, COUNT_LINES_BRICK, pane.getPrefWidth());
+        ball = new Ball(board.getX() + board.getWidth() / HALF, board.getY(), BALL_RADIUS, ballSpeed);
         angle = ball.getAngle();
     }
 
@@ -75,22 +89,22 @@ public class Utils {
 
     private void checkBallCollision() {
 
-        if (ball.intersects(0, -MARGIN, pane.getPrefWidth(), 1)) {
+        if (ball.intersects(LOCAL_X, -MARGIN, pane.getPrefWidth(), LOCAL_WIDTH_HEIGHT)) {
             topIntersect();
             checkBallAngle();
         }
-        if (ball.intersects(0, 0, 1, pane.getPrefHeight())) {
+        if (ball.intersects(LOCAL_X, LOCAL_Y, LOCAL_WIDTH_HEIGHT, pane.getPrefHeight())) {
             leftIntersect();
             checkBallAngle();
         }
-        if (ball.intersects(pane.getPrefWidth(), 0, 1, pane.getPrefHeight())) {
+        if (ball.intersects(pane.getPrefWidth(), LOCAL_Y, LOCAL_WIDTH_HEIGHT, pane.getPrefHeight())) {
             rightIntersect();
             checkBallAngle();
         }
         if (ball.intersects(board.getLayoutBounds())) {
             bottomIntersect();
             checkBallAngle();
-        } else if (ball.intersects(0, pane.getPrefHeight(), pane.getPrefWidth(), 1)) {
+        } else if (ball.intersects(LOCAL_X, pane.getPrefHeight(), pane.getPrefWidth(), LOCAL_WIDTH_HEIGHT)) {
             ball.setAlive(false);
             start = false;
         }
@@ -98,17 +112,17 @@ public class Utils {
 
         for (int i = 0; i < brick.getRectangles().size(); i++) {
             rectangle = brick.getRectangles().get(i);
-            if (ball.intersects(rectangle.getX(), rectangle.getY() + rectangle.getHeight(), rectangle.getWidth(), 0)) {
+            if (ball.intersects(rectangle.getX(), rectangle.getY() + rectangle.getHeight(), rectangle.getWidth(), LOCAL_WIDTH_HEIGHT)) {
                 topIntersect();
                 checkBallAngle();
                 rectangle.setVisible(false);
                 brick.getRectangles().remove(i);
-            } else if (ball.intersects(rectangle.getX(), rectangle.getY(), 0, rectangle.getHeight())) {
+            } else if (ball.intersects(rectangle.getX(), rectangle.getY(), LOCAL_WIDTH_HEIGHT, rectangle.getHeight())) {
                 rightIntersect();
                 checkBallAngle();
                 rectangle.setVisible(false);
                 brick.getRectangles().remove(i);
-            } else if (ball.intersects(rectangle.getX() + rectangle.getWidth(), rectangle.getY(), 0, rectangle.getHeight())) {
+            } else if (ball.intersects(rectangle.getX() + rectangle.getWidth(), rectangle.getY(), LOCAL_WIDTH_HEIGHT, rectangle.getHeight())) {
                 leftIntersect();
                 checkBallAngle();
                 rectangle.setVisible(false);
@@ -118,13 +132,13 @@ public class Utils {
     }
 
     private void checkBallAngle() {
-        if (Math.abs(angle) - Math.abs(ball.getAngle()) <= 0.0) {
+        if (Math.abs(angle) - Math.abs(ball.getAngle()) <= BALL_COLLISION_PARAM) {
             angleCount++;
             angle = ball.getAngle();
         }
-        if (angleCount == 5) {
+        if (angleCount == BALL_COLLISION_COUNT) {
             ball.changeAngle();
-            angleCount = 0;
+            angleCount = DEFAULT_ANGLE_COUNT;
         }
     }
 
@@ -141,13 +155,13 @@ public class Utils {
     }
 
     private void leftIntersect() {
-        if (ball.getAngle() > 0) ball.setAngle(Math.PI - ball.getAngle()); //going down
-        if (ball.getAngle() < 0) ball.setAngle(-Math.PI - ball.getAngle()); //going up
+        if (ball.getAngle() > DEFAULT_ANGLE_COUNT) ball.setAngle(Math.PI - ball.getAngle());
+        if (ball.getAngle() < DEFAULT_ANGLE_COUNT) ball.setAngle(-Math.PI - ball.getAngle());
     }
 
     private void rightIntersect() {
-        if (ball.getAngle() > 0) ball.setAngle(Math.PI - ball.getAngle()); //going down
-        if (ball.getAngle() < 0) ball.setAngle(-Math.PI - ball.getAngle()); //going up
+        if (ball.getAngle() > DEFAULT_ANGLE_COUNT) ball.setAngle(Math.PI - ball.getAngle());
+        if (ball.getAngle() < DEFAULT_ANGLE_COUNT) ball.setAngle(-Math.PI - ball.getAngle());
     }
 
     private void addItemsOnBoard() {
@@ -219,7 +233,7 @@ public class Utils {
     }
 
     public void changeBallSpeed(double ballSpeed) {
-        if (ballSpeed < 7) {
+        if (ballSpeed < BALL_SPEED_MAX) {
             this.ballSpeed += ballSpeed;
             ball.setSpeed(this.ballSpeed);
         }
